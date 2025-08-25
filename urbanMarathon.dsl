@@ -42,8 +42,23 @@ workspace "Name" "Description" {
         }
 
         styles {
+            element "Element" {
+                color #0773af
+                stroke #0773af
+                strokeWidth 7
+                shape roundedbox
+            }
             element "Person" {
                 shape person
+            }
+            element "Database" {
+                shape cylinder
+            }
+            element "Boundary" {
+                strokeWidth 5
+            }
+            relationship "Relationship" {
+                thickness 4
             }
         }
     }
