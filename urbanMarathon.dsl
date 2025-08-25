@@ -3,6 +3,31 @@ workspace "Name" "Description" {
     !identifiers hierarchical
 
     model {
+
+        archetypes {
+            WebApplication = container {
+
+            }
+            MobileApp = container {
+
+            }
+            Database = container {
+
+            }
+            BackendAPI = container {
+
+            }
+            NotificationService = container {
+
+            }
+            
+            Analytics = container {
+
+            }
+
+
+        } 
+
         up = person "Participants"
         uv = person "Volunteer"
         urd = person "Race Director"
@@ -12,18 +37,20 @@ workspace "Name" "Description" {
         
         
         ss = softwareSystem "Marathon Software System" {
-            wa = container "Web Application"
-            db = container "Database Schema" {
-                tags "Database"
-            }
+            wa = WebApplication "Web Application"
+            db = Database "Database Schema" 
+            bApi = BackendAPI "Backend API"
+            ns = NotificationService "Notification Service"
+            ana = Analytics "Analytics"
+            
         }
 
-        up -> ss "Registers and recieves and shares updates from"
-        uv -> ss "Recieves tasks, training material and communication updates"
-        urd -> ss "Notifies participants"
-        us -> ss "Access race information and track participants"
-        uvend -> ss "Register, select location, access participant data"
-        uvc -> ss "Manages volunteers and tasks, training and updates"
+        up -> ss "Uses"
+        uv -> ss "Uses"
+        urd -> ss "Uses"
+        us -> ss "Uses"
+        uvend -> ss "Uses"
+        uvc -> ss "Uses"
         
         
         up -> ss.wa "Uses"
