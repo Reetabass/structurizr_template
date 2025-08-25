@@ -26,8 +26,6 @@ workspace "Name" "Description" {
         uvc -> ss "Uses"
         
         
-        
-        
         up -> ss.wa "Uses"
         ss.wa -> ss.db "Reads from and writes to"
     }
