@@ -18,12 +18,12 @@ workspace "Name" "Description" {
             }
         }
 
-        up -> ss "Uses"
-        uv -> ss "Uses"
-        urd -> ss "Uses"
-        us -> ss "Uses"
-        uvend -> ss "Uses"
-        uvc -> ss "Uses"
+        up -> ss "Registers and recieves and shares updates from"
+        uv -> ss "Recieves tasks, training material and communication updates"
+        urd -> ss "Notifies participants"
+        us -> ss "Access race information and track participants"
+        uvend -> ss "Register, select location, access participant data"
+        uvc -> ss "Manages volunteers and tasks, training and updates"
         
         
         up -> ss.wa "Uses"
