@@ -45,12 +45,18 @@ workspace "Name" "Description" {
             
         }
 
-        up -> ss "Uses"
-        uv -> ss "Uses"
-        urd -> ss "Uses"
-        us -> ss "Uses"
-        uvend -> ss "Uses"
-        uvc -> ss "Uses"
+        ns = softwareSystem "Notification System" {
+            tags "ExternalEntity"
+        }
+
+        up -> ss "Registers and recieves and shares updates from"
+        uv -> ss "Recieves tasks, training material and communication updates"
+        urd -> ss "Notifies participants"
+        us -> ss "Access race information and track participants"
+        uvend -> ss "Register, select location, access participant data"
+        uvc -> ss "Manages volunteers and tasks, training and updates"
+        ss -> ns "Sends notifications using"
+        ns -> up "Sends notifications to"
         
         
         up -> ss.wa "Uses"
@@ -69,8 +75,29 @@ workspace "Name" "Description" {
         }
 
         styles {
+            element "Element" {
+                color #0773af
+                stroke #0773af
+                strokeWidth 7
+                shape roundedbox
+            }
             element "Person" {
                 shape person
+            }
+            element "Database" {
+                shape cylinder
+            }
+            element "Boundary" {
+                strokeWidth 5
+            }
+            element "ExternalEntity" {
+                color #808080
+                stroke #808080
+                strokeWidth 5
+                shape box
+            }
+            relationship "Relationship" {
+                thickness 4
             }
         }
     }
