@@ -1,4 +1,4 @@
-workspace "Name" "Description"
+workspace "Name" "Description" {
 
     !identifiers hierarchical
 
@@ -42,4 +42,11 @@ workspace "Name" "Description"
             include *
             autolayout lr
         }
+
+        styles {
+            element "Person" {
+                shape person
+            }
+        }
     }
+}
