@@ -42,4 +42,10 @@ workspace "Name" "Description"
             include *
             autolayout lr
         }
+
+        styles {
+            element "person" {
+                shape person
+            }
+        }
     }
