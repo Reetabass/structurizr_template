@@ -44,11 +44,11 @@ workspace "Name" "Description" {
             bApi = BackendAPI "Backend API" {
                 registercomp = component "Registration" "Handles participant/vendor sign-ups"
                 resetpwcomp = component "Reset Password" "Allows users to reset their password with a single-use URL"
+                resultscomp = component "Results" "Records and publishes race results"
                 racecomp = component "Race Management" "Manages routes, schedules, staggered starts"
                 volcomp = component "Volunteer Management" "Assigns tasks, tracks volunteer status"
                 trackingcomp = component "Tracking" "Real-time runner location & ETA"
                 notifcomp = component "Notification" "Triggers push/email notifications"
-                resultscomp = component "Results" "Records and publishes race results"
                 feedbackcomp = component "Feedback" "Collects participant & volunteer feedback"
             }
             ana = Analytics "Analytics"
@@ -61,6 +61,7 @@ workspace "Name" "Description" {
             tags "ExternalEntity"
         }
 
+        #Level 1
         up -> ss "Registers and recieves and shares updates from"
         uv -> ss "Recieves tasks, training material and communication updates"
         urd -> ss "Notifies participants"
@@ -70,7 +71,7 @@ workspace "Name" "Description" {
         ss -> ns "Sends notifications using"
         ns -> up "Sends notifications to"
         
-        
+        #Level 2
         up -> ss.wa "Visits sydmarathon.com using"
         ss.wa -> ss.spa "Delivers to the user's web browser"
         up -> ss.ma "Registers and receives and shares updates from"
@@ -81,7 +82,13 @@ workspace "Name" "Description" {
         ss.ana -> ss.ma "Displays analytics on"
         ss.ana -> ss.wa "Displays analytics on"
 
-        ss.spa -> ss.bApi.registercomp "User registers an account"
+        #Level 3
+        ss.spa -> ss.bApi.resetpwcomp "Makes API calls to"
+        ss.ma -> ss.bApi.resetpwcomp "Makes API calls to"
+        ss.spa -> ss.bApi.registercomp "Makes API calls to"
+        ss.ma -> ss.bApi.registercomp "Makes API calls to"
+        ss.spa -> ss.bApi.resultscomp "Makes API calls to"
+        ss.ma -> ss.bApi.resultscomp "Makes API calls to"
     }
 
     views {
@@ -97,7 +104,7 @@ workspace "Name" "Description" {
 
         component ss.bApi "Diagram3" {
             include *
-            autolayout lr
+            autolayout tb
         }
 
         styles {
