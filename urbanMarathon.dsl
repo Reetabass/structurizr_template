@@ -17,15 +17,15 @@ workspace "Name" "Description" {
             BackendAPI = container {
 
             }
-            NotificationService = container {
+            # NotificationService = container {
 
-            }
-            
+            # }
             Analytics = container {
 
             }
+            SinglePageApplication = container {
 
-
+            }
         } 
 
         up = person "Participants"
@@ -38,11 +38,16 @@ workspace "Name" "Description" {
         
         ss = softwareSystem "Marathon Software System" {
             wa = WebApplication "Web Application"
-            db = Database "Database Schema" 
+            db = Database "Database Schema" {
+                tags "Database"
+            }
             bApi = BackendAPI "Backend API"
-            ns = NotificationService "Notification Service"
+            # ns = NotificationService "Notification Service" {
+            #     tags "ExternalEntity"
+            # }
             ana = Analytics "Analytics"
-            
+            ma = MobileApp "Mobile App"
+            spa = SinglePageApplication "Single Page Application"
         }
 
         ns = softwareSystem "Notification System" {
@@ -59,8 +64,15 @@ workspace "Name" "Description" {
         ns -> up "Sends notifications to"
         
         
-        up -> ss.wa "Uses"
-        ss.wa -> ss.db "Reads from and writes to"
+        up -> ss.wa "Visits sydmarathon.com using"
+        ss.wa -> ss.spa "Delivers to the user's web browser"
+        up -> ss.ma "Registers and receives and shares updates from"
+        ss.bApi -> ss.db "Reads from and writes to"
+        ss.spa -> ss.bApi "Makes API calls to"
+        ss.ma -> ss.bApi "Makes API calls to"
+        ss.bApi -> ns "Sends notifications using"
+        ss.ana -> ss.ma "Displays analytics on"
+        ss.ana -> ss.wa "Displays analytics on"
     }
 
     views {
