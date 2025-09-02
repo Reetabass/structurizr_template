@@ -6,27 +6,29 @@ workspace "Name" "Description" {
 
         archetypes {
             WebApplication = container {
-
+                tags "Web"
             }
             MobileApp = container {
-
+                tags "Mobile"
             }
             Database = container {
-
+                tags "Database"
             }
             BackendAPI = container {
-
+                tags "Backend"
             }
             # NotificationService = container {
 
             # }
             Analytics = container {
-
+                tags "Analytics"
             }
             SinglePageApplication = container {
-
+                tags "SPA"
             }
         } 
+
+
 
         up = person "Participants"
         uv = person "Volunteer"
@@ -38,16 +40,21 @@ workspace "Name" "Description" {
         
         ss = softwareSystem "Marathon Software System" {
             wa = WebApplication "Web Application"
-            db = Database "Database Schema" {
-                tags "Database"
+            db = Database "Database Schema" 
+            bApi = BackendAPI "Backend API" {
+                registercomp = component "Registration" "Handles participant/vendor sign-ups"
+                resetpwcomp = component "Reset Password" "Allows users to reset their password with a single-use URL"
+                racecomp = component "Race Management" "Manages routes, schedules, staggered starts"
+                volcomp = component "Volunteer Management" "Assigns tasks, tracks volunteer status"
+                trackingcomp = component "Tracking" "Real-time runner location & ETA"
+                notifcomp = component "Notification" "Triggers push/email notifications"
+                resultscomp = component "Results" "Records and publishes race results"
+                feedbackcomp = component "Feedback" "Collects participant & volunteer feedback"
             }
-            bApi = BackendAPI "Backend API"
-            # ns = NotificationService "Notification Service" {
-            #     tags "ExternalEntity"
-            # }
             ana = Analytics "Analytics"
             ma = MobileApp "Mobile App"
             spa = SinglePageApplication "Single Page Application"
+            
         }
 
         ns = softwareSystem "Notification System" {
@@ -73,6 +80,8 @@ workspace "Name" "Description" {
         ss.bApi -> ns "Sends notifications using"
         ss.ana -> ss.ma "Displays analytics on"
         ss.ana -> ss.wa "Displays analytics on"
+
+        ss.spa -> ss.bApi.registercomp "User registers an account"
     }
 
     views {
@@ -82,6 +91,11 @@ workspace "Name" "Description" {
         }
 
         container ss "Diagram2" {
+            include *
+            autolayout lr
+        }
+
+        component ss.bApi "Diagram3" {
             include *
             autolayout lr
         }
