@@ -4,6 +4,13 @@ workspace "Name" "Description" {
 
     model {
 
+         /* 
+         * USERS
+         *
+         *
+         *
+         */
+
         archetypes {
             WebApplication = container {
 
@@ -28,15 +35,23 @@ workspace "Name" "Description" {
 
         } 
 
-        up = person "Participants"
-        uv = person "Volunteer"
-        urd = person "Race Director"
-        us = person "Spectator"
-        uvend = person "Vendor"
-        uvc = person "Volunteer Cordinator"
+
+        /* 
+         * USERS
+         *
+         *
+         *
+         */
+
+        le = person "Learners"
+        cc = person "Corporate Clients (HR Managers/Training Coordinators)"
+        pa = person "Platform Administrators"
+        C&I = person "Content Creators/Instructors"
+        IT = person "IT Support Staff "
         
         
-        ss = softwareSystem "Marathon Software System" {
+        ctp = softwareSystem "Corporate Training Platform" {
+            
             wa = WebApplication "Web Application"
             db = Database "Database Schema" 
             bApi = BackendAPI "Backend API"
@@ -48,7 +63,15 @@ workspace "Name" "Description" {
         ns = softwareSystem "Notification System" {
             tags "ExternalEntity"
         }
+        
 
+        /* 
+         * PUT USE CASES HERE
+         *
+         * CHANGES HERE NEED TO BE MADE
+         *
+         */
+        
         up -> ss "Registers and recieves and shares updates from"
         uv -> ss "Recieves tasks, training material and communication updates"
         urd -> ss "Notifies participants"
