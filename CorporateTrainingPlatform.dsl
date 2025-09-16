@@ -45,8 +45,8 @@ workspace "Name" "Description" {
         le = person "Learners"
         cc = person "Corporate Clients (HR Managers/Training Coordinators)"
         pa = person "Platform Administrators"
-        C&I = person "Content Creators/Instructors"
-        IT = person "IT Support Staff "
+        ci = person "Content Creators/Instructors"
+        it = person "IT Support Staff "
         
         
         ctp = softwareSystem "Corporate Training Platform" {
@@ -80,41 +80,25 @@ workspace "Name" "Description" {
          *
          */
         
-        up -> ss "Registers and recieves and shares updates from"
-        uv -> ss "Recieves tasks, training material and communication updates"
-        urd -> ss "Notifies participants"
-        us -> ss "Access race information and track participants"
-        uvend -> ss "Register, select location, access participant data"
-        uvc -> ss "Manages volunteers and tasks, training and updates"
-        ss -> ns "Sends notifications using"
-        ns -> up "Sends notifications to"
+        /* Relationships */
+        le -> ctp.wa "Uses for training"
+        cc -> ctp.wa "Manages learners"
+        pa -> ctp.wa "Administers the platform"
+        ci -> ctp.wa "Publishes training content"
+        it -> ctp.wa "Provides support"
         
-        
-        up -> ss.wa "Visits sydmarathon.com using"
-        ss.wa -> ss.spa "Delivers to the user's web browser"
-        up -> ss.ma "Registers and receives and shares updates from"
-        ss.bApi -> ss.db "Reads from and writes to"
-        ss.spa -> ss.bApi "Makes API calls to"
-        ss.ma -> ss.bApi "Makes API calls to"
-        ss.bApi -> ns "Sends notifications using"
-        ss.ana -> ss.ma "Displays analytics on"
-        ss.ana -> ss.wa "Displays analytics on"
-
-        ss.spa -> ss.bApi.registercomp "User registers an account"
+        ctp.wa -> ctp.db "Reads/writes data"
+        ctp.wa -> ctp.bApi "Makes API calls"
+        ctp.bApi -> ctp.ana "Sends usage data"
     }
 
     views {
-        systemContext ss "Diagram1" {
+        systemContext ctp "TrainingPlatformContext" {
             include *
             autolayout lr
         }
 
-        container ss "Diagram2" {
-            include *
-            autolayout lr
-        }
-
-        component ss.bApi "Diagram3" {
+        container ctp "TrainingPlatformContainers" {
             include *
             autolayout lr
         }
@@ -145,5 +129,8 @@ workspace "Name" "Description" {
                 thickness 4
             }
         }
+    }
+    configuration {
+        scope softwaresystem
     }
 }
