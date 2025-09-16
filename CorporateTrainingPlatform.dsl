@@ -1,15 +1,8 @@
-workspace "Name" "Description" {
+workspace "Corporate Training Platform" "Context diagram for the Corporate Training Platform." {
 
     !identifiers hierarchical
 
     model {
-
-         /* 
-         * USERS
-         *
-         *
-         *
-         */
 
         archetypes {
             WebApplication = container {
@@ -31,13 +24,12 @@ workspace "Name" "Description" {
 
             }
 
-
         } 
 
 
         /* Users */
 
-        le = person "Learners"
+        le = person "Learners" 
         cc = person "Corporate Clients (HR Managers/Training Coordinators)"
         pa = person "Platform Administrators"
         ci = person "Content Creators/Instructors"
@@ -66,22 +58,41 @@ workspace "Name" "Description" {
 
         /* External Systems */
 
-        ns = softwareSystem "Notification System" {
+        hrs = softwareSystem "HR System" {
             tags "ExternalEntity"
         }
-        
+        vs = softwareSystem "Video Streaming Service / CDN" {
+            tags "ExternalEntity"
+        }
+        idp = softwareSystem "Authentication Provider (SSO / Identity Provider)" {
+            tags "ExternalEntity"
+        }
+        pay = softwareSystem "Payment Gateway" {
+            tags "ExternalEntity"
+        }
+        mail = softwareSystem "Email / Notification Service" {
+            tags "ExternalEntity"
+        }
+               
      
         /* System Context Relationships */
-        le -> ctp.wa "Uses the platform to complete training and receive certificates"
-        cc -> ctp.wa "Use dashboards, assign training, integrate data with HR systems"
-        pa -> ctp.wa "Maintain system, manage accounts, monitor usage."
-        ci -> ctp.wa "Uploads/manages training content, reviews feedback and analytics"
-        it -> ctp.wa "Provides support and troubleshooting, and ensure uptime."
+        le -> ctp "Uses the platform to complete training and receive certificates"
+        cc -> ctp "Use dashboards, assign training, integrate data with HR systems"
+        pa -> ctp "Maintain system, manage accounts, monitor usage."
+        ci -> ctp "Uploads/manages training content, reviews feedback and analytics"
+        it -> ctp "Provides support and troubleshooting, and ensure uptime."
+        
+        /* External System Relationships*/
+        ctp -> hrs "Synchronises training and employee data"
+        ctp -> vs "Streams training videos"
+        ctp -> idp "Uses for secure login"
+        ctp -> pay "Handles billing and subscriptions"
+        ctp -> mail "Sends notifications, reminders, and certificates"
 
         /* Container Relationships */        
-        ctp.wa -> ctp.db "Reads/writes data"
-        ctp.wa -> ctp.bApi "Makes API calls"
-        ctp.bApi -> ctp.ana "Sends usage data"
+        # ctp.wa -> ctp.db "Reads/writes data"
+        # ctp.wa -> ctp.bApi "Makes API calls"
+        # ctp.bApi -> ctp.ana "Sends usage data"
     }
 
     views {
