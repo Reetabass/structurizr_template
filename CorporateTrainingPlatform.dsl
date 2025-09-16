@@ -35,20 +35,16 @@ workspace "Name" "Description" {
         } 
 
 
-        /* 
-         * USERS
-         *
-         *
-         *
-         */
+        /* Users */
 
         le = person "Learners"
         cc = person "Corporate Clients (HR Managers/Training Coordinators)"
         pa = person "Platform Administrators"
         ci = person "Content Creators/Instructors"
         it = person "IT Support Staff "
-        
-        
+
+        /* System */
+
         ctp = softwareSystem "Corporate Training Platform" {
             
             wa = WebApplication "Web Application"
@@ -68,25 +64,21 @@ workspace "Name" "Description" {
             
         }
 
+        /* External Systems */
+
         ns = softwareSystem "Notification System" {
             tags "ExternalEntity"
         }
         
+     
+        /* System Context Relationships */
+        le -> ctp.wa "Uses the platform to complete training and receive certificates"
+        cc -> ctp.wa "Use dashboards, assign training, integrate data with HR systems"
+        pa -> ctp.wa "Maintain system, manage accounts, monitor usage."
+        ci -> ctp.wa "Uploads/manages training content, reviews feedback and analytics"
+        it -> ctp.wa "Provides support and troubleshooting, and ensure uptime."
 
-        /* 
-         * PUT USE CASES HERE
-         *
-         * CHANGES HERE NEED TO BE MADE
-         *
-         */
-        
-        /* Relationships */
-        le -> ctp.wa "Uses for training"
-        cc -> ctp.wa "Manages learners"
-        pa -> ctp.wa "Administers the platform"
-        ci -> ctp.wa "Publishes training content"
-        it -> ctp.wa "Provides support"
-        
+        /* Container Relationships */        
         ctp.wa -> ctp.db "Reads/writes data"
         ctp.wa -> ctp.bApi "Makes API calls"
         ctp.bApi -> ctp.ana "Sends usage data"
