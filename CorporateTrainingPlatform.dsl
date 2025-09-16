@@ -11,19 +11,20 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             MobileApp = container {
                 tags "Mobile"
             }
-            Database = container {
+            Data = container {
                 tags "Database"
             }
         } 
 
-        /* Users */
+        /* Users TODO: add descriptions*/
+        
         le = person "Learners" 
         cc = person "Corporate Clients (HR Managers/Training Coordinators)"
         pa = person "Platform Administrators"
         ci = person "Content Creators/Instructors"
         it = person "IT Support Staff "
 
-        /* System */
+        /* System  TODO: add actual technologies being used for each container */
         ctp = softwareSystem "Corporate Training Platform" {
             
             wa = WebApplication "Web Application" "Allows users to access the platform from browsers."
@@ -34,8 +35,8 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             content = container "Content Management Service" "Stores and serves training materials, videos, and documents."
             ana = container "Analytics & Reporting Service" "Generates dashboards, learner progress, and course effectiveness reports." 
             certsvc = container "Certification Service" "Generates and stores digital certificates for completed courses." 
-            db = Database "Database" "Stores user accounts, course data, progress, analytics results, certificates." 
-            filestore = container "File Storage" "Stores large media files (videos, documents, certificates)."             
+            db = Data "Database" "Stores user accounts, course data, progress, analytics results, certificates." 
+            filestore = Data "File Storage" "Stores large media files (videos, documents, certificates)."             
         }
 
         /* External Systems */
