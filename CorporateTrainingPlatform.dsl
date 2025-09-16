@@ -14,21 +14,9 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             Database = container {
                 tags "Database"
             }
-            BackendAPI = container {
-                tags "Backend"
-            }
-            NotificationService = container {
-
-            }
-            Analytics = container {
-
-            }
-
         } 
 
-
         /* Users */
-
         le = person "Learners" 
         cc = person "Corporate Clients (HR Managers/Training Coordinators)"
         pa = person "Platform Administrators"
@@ -36,52 +24,48 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         it = person "IT Support Staff "
 
         /* System */
-
         ctp = softwareSystem "Corporate Training Platform" {
             
-            wa = WebApplication "Web Application"
-            db = Database "Database Schema" 
-            bApi = BackendAPI "Backend API" {
-                registercomp = component "Registration" "Handles participant/vendor sign-ups"
-                resetpwcomp = component "Reset Password" "Allows users to reset their password with a single-use URL"
-                racecomp = component "Race Management" "Manages routes, schedules, staggered starts"
-                volcomp = component "Volunteer Management" "Assigns tasks, tracks volunteer status"
-                trackingcomp = component "Tracking" "Real-time runner location & ETA"
-                notifcomp = component "Notification" "Triggers push/email notifications"
-                resultscomp = component "Results" "Records and publishes race results"
-                feedbackcomp = component "Feedback" "Collects participant & volunteer feedback"
-            }
-            ns = NotificationService "Notification Service"
-            ana = Analytics "Analytics"
-            
+            wa = WebApplication "Web Application" "Allows users to access the platform from browsers."
+            ma = MobileApp "Mobile Application" "Enables learners to access training on the go."
+            api = container "Backend API" "Provides APIs for clients (web, mobile, HR integrations)."
+            authsvc = container "Authentication & Authorization Service" "Handles user authentication, SSO, and role-based access control." 
+            lms = container "Learning Management Service" "Manages courses, enrolments, progress tracking, and adaptive learning." 
+            content = container "Content Management Service" "Stores and serves training materials, videos, and documents."
+            ana = container "Analytics & Reporting Service" "Generates dashboards, learner progress, and course effectiveness reports." 
+            certsvc = container "Certification Service" "Generates and stores digital certificates for completed courses." 
+            db = Database "Database" "Stores user accounts, course data, progress, analytics results, certificates." 
+            filestore = container "File Storage" "Stores large media files (videos, documents, certificates)."             
         }
 
         /* External Systems */
-
-        hrs = softwareSystem "HR System" {
+        hrs = softwareSystem "HR System" "Synchronises employee training and development data."{
             tags "ExternalEntity"
         }
-        vs = softwareSystem "Video Streaming Service / CDN" {
+        vs = softwareSystem "Video Streaming Service / CDN" "Delivers scalable video content."{
             tags "ExternalEntity"
         }
-        idp = softwareSystem "Authentication Provider (SSO / Identity Provider)" {
+        idp = softwareSystem "Authentication Provider (SSO / Identity Provider)" "Provides enterprise SSO / identity management."{
             tags "ExternalEntity"
         }
-        pay = softwareSystem "Payment Gateway" {
+        pay = softwareSystem "Payment Gateway" "Handles billing and subscription renewals."{
             tags "ExternalEntity"
         }
-        mail = softwareSystem "Email / Notification Service" {
+        mail = softwareSystem "Email / Notification Service" "Sends notifications, reminders, and certificates."{
             tags "ExternalEntity"
         }
                
+        /*
+        SYSTEM CONTEXT
+        */
      
-        /* System Context Relationships */
+        /* Relationships */
         le -> ctp "Uses the platform to complete training and receive certificates"
         cc -> ctp "Use dashboards, assign training, integrate data with HR systems"
         pa -> ctp "Maintain system, manage accounts, monitor usage."
         ci -> ctp "Uploads/manages training content, reviews feedback and analytics"
         it -> ctp "Provides support and troubleshooting, and ensure uptime."
-        
+
         /* External System Relationships*/
         ctp -> hrs "Synchronises training and employee data"
         ctp -> vs "Streams training videos"
@@ -89,10 +73,40 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp -> pay "Handles billing and subscriptions"
         ctp -> mail "Sends notifications, reminders, and certificates"
 
-        /* Container Relationships */        
-        # ctp.wa -> ctp.db "Reads/writes data"
-        # ctp.wa -> ctp.bApi "Makes API calls"
-        # ctp.bApi -> ctp.ana "Sends usage data"
+
+        /*
+        CONTAINER
+        */
+
+        /* Relationships, Users -> Containers */
+        le -> ctp.wa "Uses for training"
+        le -> ctp.ma "Uses for mobile learning"
+        cc -> ctp.wa "Manages employees and courses"
+        pa -> ctp.wa "Manages users and content"
+        ci -> ctp.wa "Creates and manages training content"
+        it -> ctp.wa "Provides technical support"
+
+
+        /* Relationships, Containers -> Containers */
+        ctp.wa -> ctp.api "Sends requests via REST/GraphQL"
+        ctp.ma -> ctp.api "Sends requests via REST/GraphQL"
+        ctp.api -> ctp.authsvc "Authenticates requests"
+        ctp.api -> ctp.lms "Manages enrolments, progress"
+        ctp.api -> ctp.content "Accesses training materials"
+        ctp.api -> ctp.ana "Fetches reports and dashboards"
+        ctp.api -> ctp.certsvc "Requests certificates"
+        ctp.lms -> ctp.db "Stores learner/course data"
+        ctp.content -> ctp.filestore "Stores files and media"
+        ctp.ana -> ctp.db "Reads learner data"
+        ctp.certsvc -> ctp.db "Stores certificates"
+        ctp.certsvc -> ctp.filestore "Stores certificate PDFs"
+
+        /* Relationships, Containers -> External Systems */
+        ctp.api -> hrs "Synchronises employee training data"
+        ctp.content -> vs "Streams video content"
+        ctp.authsvc -> idp "Delegates authentication"
+        ctp.api -> pay "Processes billing"
+        ctp.api -> mail "Sends notifications"
     }
 
     views {
@@ -108,23 +122,40 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
 
         styles {
             element "Element" {
-                color #0773af
-                stroke #0773af
+                color #ffffff
+                stroke #0b86c9
+                background #0b86c9
                 strokeWidth 7
-                shape roundedbox
+                shape box
+            }
+            element "Container" {
+                stroke #3875b3
+                background #438dd5
+                color #ffffff
+                shape RoundedBox
             }
             element "Person" {
                 shape person
+                color #ffffff
+                stroke #0b539c
+                background #0b539c                
             }
             element "Database" {
                 shape cylinder
             }
+            element "Mobile" {
+                shape MobileDevicePortrait
+            }
+            element "Web" {
+                shape WebBrowser
+            }            
             element "Boundary" {
                 strokeWidth 5
             }
             element "ExternalEntity" {
-                color #808080
-                stroke #808080
+                color #ffffff
+                stroke #adadad
+                background #adadad
                 strokeWidth 5
                 shape box
             }
