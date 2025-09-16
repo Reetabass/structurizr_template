@@ -13,21 +13,20 @@ workspace "Name" "Description" {
 
         archetypes {
             WebApplication = container {
-
+                tags "Web"
             }
             MobileApp = container {
-
+                tags "Mobile"
             }
             Database = container {
-
+                tags "Database"
             }
             BackendAPI = container {
-
+                tags "Backend"
             }
             NotificationService = container {
 
             }
-            
             Analytics = container {
 
             }
@@ -54,7 +53,16 @@ workspace "Name" "Description" {
             
             wa = WebApplication "Web Application"
             db = Database "Database Schema" 
-            bApi = BackendAPI "Backend API"
+            bApi = BackendAPI "Backend API" {
+                registercomp = component "Registration" "Handles participant/vendor sign-ups"
+                resetpwcomp = component "Reset Password" "Allows users to reset their password with a single-use URL"
+                racecomp = component "Race Management" "Manages routes, schedules, staggered starts"
+                volcomp = component "Volunteer Management" "Assigns tasks, tracks volunteer status"
+                trackingcomp = component "Tracking" "Real-time runner location & ETA"
+                notifcomp = component "Notification" "Triggers push/email notifications"
+                resultscomp = component "Results" "Records and publishes race results"
+                feedbackcomp = component "Feedback" "Collects participant & volunteer feedback"
+            }
             ns = NotificationService "Notification Service"
             ana = Analytics "Analytics"
             
@@ -82,8 +90,17 @@ workspace "Name" "Description" {
         ns -> up "Sends notifications to"
         
         
-        up -> ss.wa "Uses"
-        ss.wa -> ss.db "Reads from and writes to"
+        up -> ss.wa "Visits sydmarathon.com using"
+        ss.wa -> ss.spa "Delivers to the user's web browser"
+        up -> ss.ma "Registers and receives and shares updates from"
+        ss.bApi -> ss.db "Reads from and writes to"
+        ss.spa -> ss.bApi "Makes API calls to"
+        ss.ma -> ss.bApi "Makes API calls to"
+        ss.bApi -> ns "Sends notifications using"
+        ss.ana -> ss.ma "Displays analytics on"
+        ss.ana -> ss.wa "Displays analytics on"
+
+        ss.spa -> ss.bApi.registercomp "User registers an account"
     }
 
     views {
@@ -93,6 +110,11 @@ workspace "Name" "Description" {
         }
 
         container ss "Diagram2" {
+            include *
+            autolayout lr
+        }
+
+        component ss.bApi "Diagram3" {
             include *
             autolayout lr
         }
