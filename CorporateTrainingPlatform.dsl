@@ -4,6 +4,13 @@ workspace "Name" "Description" {
 
     model {
 
+         /* 
+         * USERS
+         *
+         *
+         *
+         */
+
         archetypes {
             WebApplication = container {
                 tags "Web"
@@ -17,28 +24,33 @@ workspace "Name" "Description" {
             BackendAPI = container {
                 tags "Backend"
             }
-            # NotificationService = container {
+            NotificationService = container {
 
-            # }
+            }
             Analytics = container {
-                tags "Analytics"
+
             }
-            SinglePageApplication = container {
-                tags "SPA"
-            }
+
+
         } 
 
 
+        /* 
+         * USERS
+         *
+         *
+         *
+         */
 
-        up = person "Participants"
-        uv = person "Volunteer"
-        urd = person "Race Director"
-        us = person "Spectator"
-        uvend = person "Vendor"
-        uvc = person "Volunteer Cordinator"
+        le = person "Learners"
+        cc = person "Corporate Clients (HR Managers/Training Coordinators)"
+        pa = person "Platform Administrators"
+        C&I = person "Content Creators/Instructors"
+        IT = person "IT Support Staff "
         
         
-        ss = softwareSystem "Marathon Software System" {
+        ctp = softwareSystem "Corporate Training Platform" {
+            
             wa = WebApplication "Web Application"
             db = Database "Database Schema" 
             bApi = BackendAPI "Backend API" {
@@ -51,16 +63,23 @@ workspace "Name" "Description" {
                 resultscomp = component "Results" "Records and publishes race results"
                 feedbackcomp = component "Feedback" "Collects participant & volunteer feedback"
             }
+            ns = NotificationService "Notification Service"
             ana = Analytics "Analytics"
-            ma = MobileApp "Mobile App"
-            spa = SinglePageApplication "Single Page Application"
             
         }
 
         ns = softwareSystem "Notification System" {
             tags "ExternalEntity"
         }
+        
 
+        /* 
+         * PUT USE CASES HERE
+         *
+         * CHANGES HERE NEED TO BE MADE
+         *
+         */
+        
         up -> ss "Registers and recieves and shares updates from"
         uv -> ss "Recieves tasks, training material and communication updates"
         urd -> ss "Notifies participants"
