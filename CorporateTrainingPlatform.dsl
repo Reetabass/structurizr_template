@@ -17,7 +17,7 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         } 
 
         /* Users TODO: add descriptions*/
-        
+
         le = person "Learners" 
         cc = person "Corporate Clients (HR Managers/Training Coordinators)"
         pa = person "Platform Administrators"
@@ -29,7 +29,41 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             
             wa = WebApplication "Web Application" "Allows users to access the platform from browsers."
             ma = MobileApp "Mobile Application" "Enables learners to access training on the go."
-            api = container "Backend API" "Provides APIs for clients (web, mobile, HR integrations)."
+
+            // === Backend API (expanded with components; L2 semantics unchanged) ===
+            api = container "Backend API" "Provides APIs for clients (web, mobile, HR integrations)." {
+
+                // ---- Controllers (entry points) ----
+                cSignIn   = component "Sign In Controller" "Allows users to sign in." "REST Controller"
+                cResetPwd = component "Reset Password Controller" "Password reset via one-time link." "REST Controller"
+                cSummary  = component "Learning Summary Controller" "Returns learner/course summaries for dashboards." "REST Controller"
+
+                // ---- Internal components / facades ----
+                compSecurity = component "Security Component" "Sign-in, token validation, RBAC checks." "Component"
+                compEmail    = component "E-mail Component" "Sends e-mails (verification, reset, reminders)." "Component"
+                compLms      = component "LMS Facade" "Facade/orchestration to Learning Management Service." "Component"
+                compContent  = component "Content Facade" "Facade to Content Management Service/CDN." "Component"
+                compReports  = component "Reporting Facade" "Facade to Analytics & Reporting Service." "Component"
+                compCerts    = component "Certification Facade" "Facade to Certification Service." "Component"
+                compHrSync   = component "HR Sync Facade" "Facade to external HR systems." "Component"
+
+                // ---- Clients call controllers (for L3 view context) ----
+                ctp.wa -> cSignIn   "Makes API call (login / refresh token) to" "JSON/HTTPS"
+                ctp.ma -> cSignIn   "Makes API call (login / refresh token)"
+                ctp.wa -> cResetPwd "Makes API call (reset password)" "JSON/HTTPS"
+                ctp.wa -> cSummary  "Makes API call (fetch dashboard/summary)"
+                ctp.ma -> cSummary  "Makes API call (fetch dashboard/summary)"
+
+                // ---- Controllers use internal components ----
+                cSignIn -> compSecurity "Validates credentials"
+                cResetPwd -> compEmail "Requests password reset email"
+                cSummary -> compLms "Fetch enrolments, course progress"
+                cSummary -> compContent "Retrieve thumbnails & learning assets"
+                cSummary -> compReports "Fetch analytics for dashboard"
+                cSummary -> compCerts "Uses (status/badges)"
+                compHrSync -> compCerts "Check certificate status/badges"
+            }
+
             authsvc = container "Authentication & Authorization Service" "Handles user authentication, SSO, and role-based access control." 
             lms = container "Learning Management Service" "Manages courses, enrolments, progress tracking, and adaptive learning." 
             content = container "Content Management Service" "Stores and serves training materials, videos, and documents."
@@ -59,7 +93,7 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         /*
         SYSTEM CONTEXT
         */
-     
+        
         /* Relationships */
         le -> ctp "Uses the platform to complete training and receive certificates"
         cc -> ctp "Use dashboards, assign training, integrate data with HR systems"
@@ -117,6 +151,11 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         }
 
         container ctp "TrainingPlatformContainers" {
+            include *
+            autolayout lr
+        }
+
+        component ctp.api "TrainingPlatformComponent" {
             include *
             autolayout lr
         }
