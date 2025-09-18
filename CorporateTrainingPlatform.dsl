@@ -30,31 +30,31 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             wa = WebApplication "Web Application" "Allows users to access the platform from browsers."
             ma = MobileApp "Mobile Application" "Enables learners to access training on the go."
 
-            // === Backend API (expanded with components; L2 semantics unchanged) ===
+            // Backend API (expanded with components)
             api = container "Backend API" "Provides APIs for clients (web, mobile, HR integrations)." {
 
-                // ---- Controllers (entry points) ----
-                cSignIn   = component "Sign In Controller" "Allows users to sign in." "REST Controller"
+                // Controllers (entry points)
+                cSignIn = component "Sign In Controller" "Allows users to sign in." "REST Controller"
                 cResetPwd = component "Reset Password Controller" "Password reset via one-time link." "REST Controller"
-                cSummary  = component "Learning Summary Controller" "Returns learner/course summaries for dashboards." "REST Controller"
+                cSummary = component "Learning Summary Controller" "Returns learner/course summaries for dashboards." "REST Controller"
 
-                // ---- Internal components / facades ----
+                // Internal components / facades
                 compSecurity = component "Security Component" "Sign-in, token validation, RBAC checks." "Component"
-                compEmail    = component "E-mail Component" "Sends e-mails (verification, reset, reminders)." "Component"
-                compLms      = component "LMS Facade" "Facade/orchestration to Learning Management Service." "Component"
-                compContent  = component "Content Facade" "Facade to Content Management Service/CDN." "Component"
-                compReports  = component "Reporting Facade" "Facade to Analytics & Reporting Service." "Component"
-                compCerts    = component "Certification Facade" "Facade to Certification Service." "Component"
-                compHrSync   = component "HR Sync Facade" "Facade to external HR systems." "Component"
+                compEmail = component "E-mail Component" "Sends e-mails (verification, reset, reminders)." "Component"
+                compLms = component "LMS Facade" "Facade/orchestration to Learning Management Service." "Component"
+                compContent = component "Content Facade" "Facade to Content Management Service/CDN." "Component"
+                compReports = component "Reporting Facade" "Facade to Analytics & Reporting Service." "Component"
+                compCerts = component "Certification Facade" "Facade to Certification Service." "Component"
+                compHrSync = component "HR Sync Facade" "Facade to external HR systems." "Component"
 
-                // ---- Clients call controllers (for L3 view context) ----
-                ctp.wa -> cSignIn   "Makes API call (login / refresh token) to" "JSON/HTTPS"
-                ctp.ma -> cSignIn   "Makes API call (login / refresh token)"
+                // Clients call controllers
+                ctp.wa -> cSignIn "Makes API call (login / refresh token) to" "JSON/HTTPS"
+                ctp.ma -> cSignIn "Makes API call (login / refresh token)"
                 ctp.wa -> cResetPwd "Makes API call (reset password)" "JSON/HTTPS"
-                ctp.wa -> cSummary  "Makes API call (fetch dashboard/summary)"
-                ctp.ma -> cSummary  "Makes API call (fetch dashboard/summary)"
+                ctp.wa -> cSummary "Makes API call (fetch dashboard/summary)"
+                ctp.ma -> cSummary "Makes API call (fetch dashboard/summary)"
 
-                // ---- Controllers use internal components ----
+                // Controllers use internal components
                 cSignIn -> compSecurity "Validates credentials"
                 cResetPwd -> compEmail "Requests password reset email"
                 cSummary -> compLms "Fetch enrolments, course progress"
@@ -121,7 +121,6 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ci -> ctp.wa "Creates and manages training content"
         it -> ctp.wa "Provides technical support"
 
-
         /* Relationships, Containers -> Containers */
         ctp.wa -> ctp.api "Sends requests via REST/GraphQL"
         ctp.ma -> ctp.api "Sends requests via REST/GraphQL"
@@ -142,22 +141,42 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp.authsvc -> idp "Delegates authentication"
         ctp.api -> pay "Processes billing"
         ctp.api -> mail "Sends notifications"
+
+        /*
+        COMPONENT
+        */
+
+        # Security component -> Auth provider (grey)
+        ctp.api.compSecurity -> idp "Uses"
+        # Email component -> email/notif service (grey)
+        ctp.api.compEmail -> mail "Uses"
+        # Content facade -> Content management service
+        ctp.api.compContent -> ctp.content "Uses"
+        # Reporting facade -> analytics and reporting service
+        ctp.api.compReports -> ctp.ana "Uses"
+        # LMS facade -> learning management service
+        ctp.api.compLms -> ctp.lms "Uses"
+        # Certification facade -> certification service
+        ctp.api.compCerts -> ctp.certsvc "Uses"
+        # HR sync facade -> Hr system (grey)
+        ctp.api.compHrSync -> hrs "Uses"
+
     }
 
     views {
         systemContext ctp "TrainingPlatformContext" {
             include *
-            autolayout lr
+            autolayout tb
         }
 
         container ctp "TrainingPlatformContainers" {
             include *
-            autolayout lr
+            autolayout tb
         }
 
         component ctp.api "TrainingPlatformComponent" {
             include *
-            autolayout lr
+            autolayout tb
         }
 
         styles {
