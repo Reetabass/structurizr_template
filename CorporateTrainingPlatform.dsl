@@ -49,7 +49,7 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
 
                 // Clients call controllers
                 ctp.wa -> cSignIn "Makes API call (login / refresh token) to" "JSON/HTTPS"
-                ctp.ma -> cSignIn "Makes API call (login / refresh token)"
+                ctp.ma -> cSignIn "Makes API call (login / refresh token) to" "JSON/HTTPS"
                 ctp.wa -> cResetPwd "Makes API call (reset password)" "JSON/HTTPS"
                 ctp.wa -> cSummary "Makes API call (fetch dashboard/summary)"
                 ctp.ma -> cSummary "Makes API call (fetch dashboard/summary)"
