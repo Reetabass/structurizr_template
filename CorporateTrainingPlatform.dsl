@@ -62,6 +62,12 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
                 cSummary -> compReports "Fetch analytics for dashboard"
                 cSummary -> compCerts "Uses (status/badges)"
                 compHrSync -> compCerts "Check certificate status/badges"
+
+                // Physical components
+                compConceptual = component "Conceptual Data Model (Entities)" "High-level entities & relationships"
+                compLogical    = component "Logical Data Model (Normalized Tables)" "Attributes, PK/FK, cardinality"
+                compPhysical   = component "Physical Data Model (DDL)" "SQL tables, indexes, constra"
+
             }
 
             authsvc = container "Authentication & Authorization Service" "Handles user authentication, SSO, and role-based access control." 
@@ -70,7 +76,11 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             ana = container "Analytics & Reporting Service" "Generates dashboards, learner progress, and course effectiveness reports." 
             certsvc = container "Certification Service" "Generates and stores digital certificates for completed courses." 
             db = Data "Database" "Stores user accounts, course data, progress, analytics results, certificates." 
-            filestore = Data "File Storage" "Stores large media files (videos, documents, certificates)."             
+            
+            // Physical
+            filestore = Data "File Storage" "Stores large media files (videos, documents, certificates)." 
+            elt = container "ETL/ELT Process" "Moves data from OLTP to warehouse; schedules transforms."
+            dw  = Data "Data Warehouse" "Curated analytics layer (star schemas, aggregates)."            
         }
 
         /* External Systems */
@@ -89,6 +99,14 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         mail = softwareSystem "Email / Notification Service" "Sends notifications, reminders, and certificates."{
             tags "ExternalEntity"
         }
+        // Physical
+        bi = softwareSystem "Analytics & BI Platform" "External dashboards & ad-hoc analysis."{
+            tags "ExternalEntity"
+        }
+        backup = softwareSystem "Backup/Archive Store" "Encrypted snapshots & long-term retention."{
+            tags "ExternalEntity"
+        }
+
                
         /*
         SYSTEM CONTEXT
@@ -107,6 +125,9 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp -> idp "Uses for secure login"
         ctp -> pay "Handles billing and subscriptions"
         ctp -> mail "Sends notifications, reminders, and certificates"
+        ctp -> bi "Publishes curated datasets for reporting"
+        ctp -> backup "Sends encrypted backups/snapshots"
+
 
 
         /*
@@ -134,6 +155,11 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp.ana -> ctp.db "Reads learner data"
         ctp.certsvc -> ctp.db "Stores certificates"
         ctp.certsvc -> ctp.filestore "Stores certificate PDFs"
+        ctp.db -> ctp.elt "Feeds operational data (batch/CDC) to"
+        ctp.elt -> ctp.dw "Transforms and loads curated models into"
+        ctp.dw -> bi "Serves governed datasets to"
+        ctp.db -> backup "Backups (PITR/snapshots) to"
+        ctp.dw -> backup "Daily warehouse snapshots to"
 
         /* Relationships, Containers -> External Systems */
         ctp.api -> hrs "Synchronises employee training data"
@@ -160,6 +186,12 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp.api.compCerts -> ctp.certsvc "Uses"
         # HR sync facade -> Hr system (grey)
         ctp.api.compHrSync -> hrs "Uses"
+
+        // Physical
+        ctp.api.compConceptual -> ctp.api.compLogical "Refines entities to normalized tables"
+        ctp.api.compLogical    -> ctp.db              "Informs OLTP schema design"
+        ctp.api.compPhysical   -> ctp.db              "Implements SQL DDL (PKs/FKs, indexes)"
+
 
     }
 
