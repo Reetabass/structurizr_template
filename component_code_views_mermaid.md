@@ -49,23 +49,4 @@ classDiagram
     SecurityComponentService --> IdentityAccessManager : "Authenticate & enforce MFA/RBAC"
     SecurityComponentService --> PrivacyVaultAdapter : "Encrypt/Tokenise sensitive data"
     SecurityComponentRepository --> CloudAuditConnector : "Push audit logs for compliance"
-
-    %% === NOTES ===
-    note for SecurityComponentService
-        Applies AES-256 encryption at rest
-        and TLS 1.3 for data in transit.
-        Integrates with IAM for MFA + RBAC.
-    end note
-
-    note for PrivacyVaultAdapter
-        Stores personally identifiable information (PII)
-        outside the main database.
-        Supports tokenisation and GDPR requests.
-    end note
-
-    note for CloudAuditConnector
-        Sends security logs and configuration snapshots
-        to cloud-based compliance monitoring dashboards.
-        Enables traceability and repudiation prevention.
-    end note
 ```
