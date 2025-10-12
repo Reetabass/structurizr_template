@@ -46,7 +46,7 @@ classDiagram
     SecurityComponentRepository ..> SecurityComponentEntity
 
     %% === NEW CLOUD/SECURITY/PRIVACY LINKS ===
-    SecurityComponentService --> IdentityAccessManager : "Authenticate & enforce MFA/RBAC"
-    SecurityComponentService --> PrivacyVaultAdapter : "Encrypt/Tokenise sensitive data"
-    SecurityComponentRepository --> CloudAuditConnector : "Push audit logs for compliance"
+    SecurityComponentService --> IdentityAccessManager
+    SecurityComponentService --> PrivacyVaultAdapter
+    SecurityComponentRepository --> CloudAuditConnector
 ```
