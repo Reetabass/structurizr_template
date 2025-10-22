@@ -78,11 +78,9 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             db = Data "Database" "Stores user accounts, course data, progress, analytics results, certificates." 
             datalake = Data "Data Lake (Object Storage)" "Raw and curated datasets stored in object storage. Serves as landing zone for ELT and analytics."
             streaming = container "Event Streaming (Kafka/Kinesis)" "Publishes and processes learner interaction events for real-time analytics and adaptive learning." 
-
-
-            // Physical
             elt = container "ELT Process" "Extracts and loads raw data into the lake, then performs transformations within the warehouse for analytics."
-            dw  = Data "Data Warehouse" "Curated analytics layer (star schemas, aggregates)."            
+            dw  = Data "Data Warehouse" "Curated analytics layer (star schemas, aggregates)."
+            backup = container "Backup/Archive Store" "Encrypted snapshots & long-term retention."            
         }
 
         /* External Systems */
@@ -105,9 +103,6 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         bi = softwareSystem "Analytics & BI Platform" "External dashboards & ad-hoc analysis."{
             tags "ExternalEntity"
         }
-        backup = softwareSystem "Backup/Archive Store" "Encrypted snapshots & long-term retention."{
-            tags "ExternalEntity"
-        }
 
                
         /*
@@ -128,8 +123,6 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp -> pay "Handles billing and subscriptions"
         ctp -> mail "Sends notifications, reminders, and certificates"
         ctp -> bi "Publishes curated datasets for reporting"
-        ctp -> backup "Sends encrypted backups/snapshots"
-
 
 
         /*
@@ -147,13 +140,16 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         /* Relationships, Containers -> Containers */
         ctp.wa -> ctp.api "Sends requests via REST/GraphQL"
         ctp.ma -> ctp.api "Sends requests via REST/GraphQL"
+
         ctp.api -> ctp.authsvc "Authenticates requests"
         ctp.api -> ctp.lms "Manages enrolments, progress"
         ctp.api -> ctp.content "Accesses training materials"
-        ctp.api -> ctp.ana "Fetches reports and dashboards"
-        
+        ctp.api -> ctp.ana "Fetches reports and dashboards"        
         ctp.api -> ctp.certsvc "Requests certificates"
+        ctp.api -> ctp.streaming "Publishes learner interaction events (video_play, quiz_submission, progress_update)" 
+
         ctp.lms -> ctp.db "Stores learner/course data"
+
         ctp.ana -> ctp.db "Reads learner data"
         ctp.ana -> ctp.dw "Queries curated data models for dashboards and reporting"
 
@@ -161,29 +157,18 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp.certsvc -> ctp.datalake "Stores certificate PDFs (signed, time-limited URLs)"
         
         ctp.db -> ctp.elt "Feeds operational data (batch/CDC) to"
-        ctp.elt -> ctp.dw "Transforms and loads structured data for analytics"
+        ctp.db -> ctp.backup "Backups (PITR/snapshots) to"        
         
-        ctp.dw -> bi "Serves governed datasets to"
-        ctp.db -> backup "Backups (PITR/snapshots) to"
-        ctp.dw -> backup "Daily warehouse snapshots to"
+        ctp.dw -> bi "Serves curated datasets to"        
+        ctp.dw -> ctp.backup "Daily warehouse snapshots to"
 
-        // API publishes events for real-time processing
-        ctp.api -> ctp.streaming "Publishes learner interaction events (video_play, quiz_submission, progress_update)" 
-
-        // Stream processor consumes events, seeds feature store and writes to datalake
         ctp.streaming -> ctp.datalake "Writes events as raw files in real-time"
 
-
-        // ETL/ELT reads from DB, streaming and data lake and writes to DW
         ctp.elt -> ctp.datalake "Stores raw exports and staging"
         ctp.elt -> ctp.streaming "Consumes event streams (near-real-time ETL)"
+        ctp.elt -> ctp.dw "Transforms and loads structured data for analytics"
 
-        // CDN / Video service fetches video from data lake / object store
-        vs -> ctp.datalake "Pulls video chunks / manifests (origin fetch)"
         ctp.content -> ctp.datalake "Uploads original video assets and retrieves signed URLs"
-
-        // Analytics / BI reads the DW and can also query the feature store for near-real-time metrics
-        ctp.dw -> bi "Serves curated datasets and marts to BI"
 
         /* Relationships, Containers -> External Systems */
         ctp.api -> hrs "Synchronises employee training data"
@@ -191,6 +176,7 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp.authsvc -> idp "Delegates authentication"
         ctp.api -> pay "Processes billing"
         ctp.api -> mail "Sends notifications"
+        vs -> ctp.datalake "Pulls video chunks / manifests (origin fetch)"
 
         /*
         COMPONENT
@@ -216,7 +202,6 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
         ctp.api.compLogical    -> ctp.db              "Informs OLTP schema design"
         ctp.api.compPhysical   -> ctp.db              "Implements SQL DDL (PKs/FKs, indexes)"
 
-
     }
 
     views {
@@ -230,7 +215,12 @@ workspace "Corporate Training Platform" "Context diagram for the Corporate Train
             autolayout tb
         }
 
-        component ctp.api "TrainingPlatformComponent" {
+        component ctp.api "BackendAPIComponent" {
+            include *
+            autolayout tb
+        }
+        
+        component ctp.elt "ELTComponent" {
             include *
             autolayout tb
         }
